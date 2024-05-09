@@ -12,7 +12,7 @@ pub struct MapBuilder {
 impl MapBuilder {
     pub fn new(rng: &mut RandomNumberGenerator) -> Self {
         const UNREACHABLE: &f32 = &f32::MAX;
-        
+
         let mut mb = MapBuilder {
             map: Map::new(),
             rooms: Vec::new(),
