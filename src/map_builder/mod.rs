@@ -1,6 +1,7 @@
 use crate::prelude::*;
-use rooms::RoomsArchitect;
+use automata::CellularAutomataArchitect;
 
+mod automata;
 mod empty;
 mod rooms;
 
@@ -20,7 +21,7 @@ pub struct MapBuilder {
 
 impl MapBuilder {
     pub fn new(rng: &mut RandomNumberGenerator) -> Self {
-        let mut architect = RoomsArchitect {};
+        let mut architect = CellularAutomataArchitect {};
         architect.build(rng)
     }
 
@@ -110,5 +111,29 @@ impl MapBuilder {
                 self.apply_horizontal_tunnel(prev.x, new.x, new.y);
             }
         }
+    }
+
+    fn spawn_monsters(&self, start: &Point, rng: &mut RandomNumberGenerator) -> Vec<Point> {
+        const NUM_MONSTERS: usize = 50;
+        let mut spawnable_tiles: Vec<Point> = self
+            .map
+            .tiles
+            .iter()
+            .enumerate()
+            .filter(|(idx, t)| {
+                **t == TileType::Floor
+                    && DistanceAlg::Pythagoras.distance2d(*start, self.map.index_to_point2d(*idx))
+                        > 10.0
+            })
+            .map(|(idx, _)| self.map.index_to_point2d(idx))
+            .collect();
+
+        let mut spawns = Vec::new();
+        for _ in 0..NUM_MONSTERS {
+            let target_idx = rng.random_slice_index(&spawnable_tiles).unwrap();
+            spawns.push(spawnable_tiles[target_idx]);
+            spawnable_tiles.remove(target_idx);
+        }
+        spawns
     }
 }
