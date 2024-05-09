@@ -1,7 +1,8 @@
-mod empty;
-
 use crate::prelude::*;
-use empty::EmptyArchitect;
+use rooms::RoomsArchitect;
+
+mod empty;
+mod rooms;
 
 trait MapArchitect {
     fn build(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder;
@@ -19,7 +20,7 @@ pub struct MapBuilder {
 
 impl MapBuilder {
     pub fn new(rng: &mut RandomNumberGenerator) -> Self {
-        let mut architect = EmptyArchitect {};
+        let mut architect = RoomsArchitect {};
         architect.build(rng)
     }
 
@@ -58,7 +59,7 @@ impl MapBuilder {
                 rng.range(2, 10),
             );
             let mut overlap = false;
-            for r in self.rooms.iter() {
+            for r in &self.rooms {
                 if r.intersect(&room) {
                     overlap = true;
                 }
